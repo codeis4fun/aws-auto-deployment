@@ -1,12 +1,14 @@
 provider "aws" {
     region = var.region
 }
-backend "s3" {
-bucket = "terraform-ci-deploy"
-key    = "infra-state"
-region = var.region
-}
 
+terraform {
+  backend "s3" {
+    bucket = "terraform-ci-deploy"
+    key    = "infra-state"
+    region = var.region
+  }
+}
 variable "bucket_name" {
     description = "Bucket principal"
     type = string
