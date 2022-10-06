@@ -16,6 +16,7 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
+    environment: staging 
     strategy:
       matrix:
         node-version: [16.x]
@@ -25,6 +26,12 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+
+    - name: install deploy compose
+      run: npm i serverless-compose
+      with:
+        node-version: ${{ matrix.node-version }}
+
     - name: serverless deploy
       uses: serverless/github-action@v3
       with:
