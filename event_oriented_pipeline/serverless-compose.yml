@@ -1,6 +1,6 @@
 state:
   backend: s3
-  prefix: infra-state
+  prefix: terraform-ci-deploy
 
 services:
 
