@@ -1,6 +1,5 @@
 state:
   backend: s3
-  existingBucket: terraform-ci-deploy
 
 services:
   a-from-s3-to-sqs:
