@@ -28,7 +28,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: install serverless
-      run: npm i @serverless/cli
+      run: npm install -g serverless
 
     - name: install serverless compose
       run: npm i -g @serverless/compose
