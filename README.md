@@ -62,7 +62,7 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 			{"BibNum":2758319,"Title":"The great molasses flood : Boston, 1919 \/ Deborah Kops.","Author":"Kops, Deborah","ISBN":"1580893481, 158089349X, 9781580893480, 9781580893497","PublicationYear":"c2012.","Publisher":"Charlesbridge,","Subjects":"Industrial accidents Massachusetts Boston History 20th century Juvenile literature, Molasses industry Accidents Massachusetts Boston History 20th century Juvenile literature, Alcohol industry Accidents Massachusetts Boston History 20th century Juvenile literature, Floods Massachusetts Boston History 20th century Juvenile literature, Boston Mass History Juvenile literature, Industrial accidents Juvenile literature, Molasses industry Accidents Juvenile literature, Alcohol industry Accidents Juvenile literature, Floods Juvenile literature","ItemType":"jcbk","ItemCollection":"ncnf","FloatingItem":null,"ItemLocation":"swt","ReportDate":"2017-09-01T00:00:00.000","ItemCount":1}
 
 
--	# Scripts para ingestão por eventos
+-	## Scripts para ingestão por eventos
 	-	*event_oriented_pipeline/step01/handler.py*: Esta função **Lambda** é disparada toda vez que novos arquivos com prefixo ***ingest-csv*** são enviados ao bucket **abdo6-grupo-k-ci-deploy**. O destino da mensagem do evento é a fila ***ingest-csv-queue***.
 	-	
 		Exemplo de log gerado na função:
