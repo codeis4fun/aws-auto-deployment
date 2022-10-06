@@ -40,7 +40,14 @@ jobs:
         cp -r ./modules ./event_oriented_pipeline/step03/
         cp -r ./modules ./event_oriented_pipeline/step04/
 
+    - name: serverless-compose test
+      run: "cd ./event_oriented_pipeline && serverless-compose deploy --no-Deploy"
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
     - name: serverless-compose deploy
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: "cd ./event_oriented_pipeline && serverless-compose deploy"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
