@@ -2,7 +2,6 @@ state:
   backend: s3
 
 services:
-
   a-from-s3-to-sqs:
     path: step01
 
