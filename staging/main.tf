@@ -6,7 +6,7 @@ terraform {
   backend "s3" {
     bucket = "terraform-ci-deploy"
     key    = "infra-state"
-    region = var.region
+    region = "us-west-2"
   }
 }
 variable "bucket_name" {
