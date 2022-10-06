@@ -1,0 +1,25 @@
+service: a-from-s3-to-sqs
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.8
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "sqs:*"
+      Resource: 
+        - "arn:aws:sqs:us-west-2:007774094020:first-queue"
+        
+functions:
+  myEventTrigger:
+    handler: handler.step01
+    events:
+      - s3:
+         bucket: abdo6-grupo-k-terraform
+         event: s3:ObjectCreated:*
+         rules:
+            - prefix: ingest_csv/
+         existing: true

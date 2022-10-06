@@ -1,0 +1,17 @@
+state:
+  backend: s3
+  prefix: infra-state
+
+services:
+
+  a-from-s3-to-sqs:
+    path: step01
+ 
+  b-from-sqs-to-s3:
+    path: step02
+  
+  c-from-s3-to-sqs:
+    path: step03
+
+  d-from-sqs-to-firehose:
+    path: step04

@@ -1,0 +1,29 @@
+service: b-from-sqs-to-s3
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.7
+  region: us-west-2
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "s3:*"
+      Resource: 
+        - "arn:aws:s3:::*"
+        
+layers:
+  pandas:
+    package:
+      artifact: pandas.zip
+
+functions:
+  myEventTrigger:
+    handler: handler.step02
+    events:
+      - sqs:
+          arn: arn:aws:sqs:us-west-2:007774094020:first-queue
+          batchSize: 1
+          maximumBatchingWindow: 60
+          functionResponseType: ReportBatchItemFailures
