@@ -297,7 +297,7 @@ resource "aws_glue_crawler" "crawler" {
 resource "aws_glue_job" "transform-to-parquet" {
   name     = "transform-to-parquet"
   role_arn = [for value in aws_iam_role.crawler-role: value.arn][0]
-  number_of_workers = 3
+  number_of_workers = 6
   worker_type = "G.1X"
   glue_version = "3.0"
 
