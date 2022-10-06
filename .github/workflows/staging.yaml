@@ -105,7 +105,7 @@ jobs:
             ${plans[i]}
             \`\`\`
             </details>
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;   
+            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ github.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;   
 
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
