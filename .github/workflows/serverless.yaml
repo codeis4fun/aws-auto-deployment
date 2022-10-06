@@ -1,5 +1,4 @@
 name: 'Serverless - Deploy'
-
 on:
   push:
     branches:
@@ -20,6 +19,7 @@ jobs:
     strategy:
       matrix:
         node-version: [16.x]
+        
     steps:
     - uses: actions/checkout@v3
     - name: Use Node.js ${{ matrix.node-version }}
