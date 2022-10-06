@@ -158,161 +158,161 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose-ds" {
   
 }
 
-resource "aws_iam_role" "crawler-role" {
-  for_each = toset(var.crawlers)
-  name = "crawler-role-${each.value}"
+# resource "aws_iam_role" "crawler-role" {
+#   for_each = toset(var.crawlers)
+#   name = "crawler-role-${each.value}"
 
-  assume_role_policy = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Effect": "Allow",
-            "Principal": {
-                "Service": "glue.amazonaws.com"
-            },
-            "Action": "sts:AssumeRole"
-        }
-    ]
-}
-  EOF
-}
+#   assume_role_policy = <<EOF
+#   {
+#     "Version": "2012-10-17",
+#     "Statement": [
+#         {
+#             "Effect": "Allow",
+#             "Principal": {
+#                 "Service": "glue.amazonaws.com"
+#             },
+#             "Action": "sts:AssumeRole"
+#         }
+#     ]
+# }
+#   EOF
+# }
 
-resource "aws_iam_role_policy" "crawler-role-policy" {
-  for_each = toset(var.crawlers)
-  name        = "crawler-role-policy"
-  role   = aws_iam_role.crawler-role[each.key].id
+# resource "aws_iam_role_policy" "crawler-role-policy" {
+#   for_each = toset(var.crawlers)
+#   name        = "crawler-role-policy"
+#   role   = aws_iam_role.crawler-role[each.key].id
 
-  policy = <<EOF
-{
-	"Version": "2012-10-17",
-	"Statement": [{
-			"Effect": "Allow",
-			"Action": [
-				"glue:*",
-				"s3:GetBucketLocation",
-				"s3:ListBucket",
-				"s3:ListAllMyBuckets",
-				"s3:GetBucketAcl",
-				"ec2:DescribeVpcEndpoints",
-				"ec2:DescribeRouteTables",
-				"ec2:CreateNetworkInterface",
-				"ec2:DeleteNetworkInterface",
-				"ec2:DescribeNetworkInterfaces",
-				"ec2:DescribeSecurityGroups",
-				"ec2:DescribeSubnets",
-				"ec2:DescribeVpcAttribute",
-				"iam:ListRolePolicies",
-				"iam:GetRole",
-				"iam:GetRolePolicy",
-				"cloudwatch:PutMetricData"
-			],
-			"Resource": [
-				"*"
-			]
-		},
-		{
-			"Effect": "Allow",
-			"Action": [
-				"s3:CreateBucket"
-			],
-			"Resource": [
-				"arn:aws:s3:::aws-glue-*"
-			]
-		},
-		{
-			"Effect": "Allow",
-			"Action": [
-				"s3:GetObject",
-				"s3:PutObject",
-				"s3:DeleteObject"
-			],
-			"Resource": [
-				"arn:aws:s3:::aws-glue-*/*",
-				"arn:aws:s3:::*/*aws-glue-*/*",
-        "arn:aws:s3:::${var.bucket_name}/*"
-			]
-		},
-		{
-			"Effect": "Allow",
-			"Action": [
-				"s3:GetObject"
-			],
-			"Resource": [
-				"arn:aws:s3:::crawler-public*",
-				"arn:aws:s3:::aws-glue-*"
-			]
-		},
-		{
-			"Effect": "Allow",
-			"Action": [
-				"logs:CreateLogGroup",
-				"logs:CreateLogStream",
-				"logs:PutLogEvents"
-			],
-			"Resource": [
-				"arn:aws:logs:*:*:/aws-glue/*"
-			]
-		},
-		{
-			"Effect": "Allow",
-			"Action": [
-				"ec2:CreateTags",
-				"ec2:DeleteTags"
-			],
-			"Condition": {
-				"ForAllValues:StringEquals": {
-					"aws:TagKeys": [
-						"aws-glue-service-resource"
-					]
-				}
-			},
-			"Resource": [
-				"arn:aws:ec2:*:*:network-interface/*",
-				"arn:aws:ec2:*:*:security-group/*",
-				"arn:aws:ec2:*:*:instance/*"
-			]
-		},
-		{
-			"Effect": "Allow",
-			"Action": [
-				"s3:GetObject",
-				"s3:PutObject"
-			],
-			"Resource": [
-				"arn:aws:s3:::abdo6-grupo-k-ci-deploy/${aws_glue_crawler.crawler[each.key].name}*"
-			]
-		}
-	]
-} 
-EOF
-}
+#   policy = <<EOF
+# {
+# 	"Version": "2012-10-17",
+# 	"Statement": [{
+# 			"Effect": "Allow",
+# 			"Action": [
+# 				"glue:*",
+# 				"s3:GetBucketLocation",
+# 				"s3:ListBucket",
+# 				"s3:ListAllMyBuckets",
+# 				"s3:GetBucketAcl",
+# 				"ec2:DescribeVpcEndpoints",
+# 				"ec2:DescribeRouteTables",
+# 				"ec2:CreateNetworkInterface",
+# 				"ec2:DeleteNetworkInterface",
+# 				"ec2:DescribeNetworkInterfaces",
+# 				"ec2:DescribeSecurityGroups",
+# 				"ec2:DescribeSubnets",
+# 				"ec2:DescribeVpcAttribute",
+# 				"iam:ListRolePolicies",
+# 				"iam:GetRole",
+# 				"iam:GetRolePolicy",
+# 				"cloudwatch:PutMetricData"
+# 			],
+# 			"Resource": [
+# 				"*"
+# 			]
+# 		},
+# 		{
+# 			"Effect": "Allow",
+# 			"Action": [
+# 				"s3:CreateBucket"
+# 			],
+# 			"Resource": [
+# 				"arn:aws:s3:::aws-glue-*"
+# 			]
+# 		},
+# 		{
+# 			"Effect": "Allow",
+# 			"Action": [
+# 				"s3:GetObject",
+# 				"s3:PutObject",
+# 				"s3:DeleteObject"
+# 			],
+# 			"Resource": [
+# 				"arn:aws:s3:::aws-glue-*/*",
+# 				"arn:aws:s3:::*/*aws-glue-*/*",
+#         "arn:aws:s3:::${var.bucket_name}/*"
+# 			]
+# 		},
+# 		{
+# 			"Effect": "Allow",
+# 			"Action": [
+# 				"s3:GetObject"
+# 			],
+# 			"Resource": [
+# 				"arn:aws:s3:::crawler-public*",
+# 				"arn:aws:s3:::aws-glue-*"
+# 			]
+# 		},
+# 		{
+# 			"Effect": "Allow",
+# 			"Action": [
+# 				"logs:CreateLogGroup",
+# 				"logs:CreateLogStream",
+# 				"logs:PutLogEvents"
+# 			],
+# 			"Resource": [
+# 				"arn:aws:logs:*:*:/aws-glue/*"
+# 			]
+# 		},
+# 		{
+# 			"Effect": "Allow",
+# 			"Action": [
+# 				"ec2:CreateTags",
+# 				"ec2:DeleteTags"
+# 			],
+# 			"Condition": {
+# 				"ForAllValues:StringEquals": {
+# 					"aws:TagKeys": [
+# 						"aws-glue-service-resource"
+# 					]
+# 				}
+# 			},
+# 			"Resource": [
+# 				"arn:aws:ec2:*:*:network-interface/*",
+# 				"arn:aws:ec2:*:*:security-group/*",
+# 				"arn:aws:ec2:*:*:instance/*"
+# 			]
+# 		},
+# 		{
+# 			"Effect": "Allow",
+# 			"Action": [
+# 				"s3:GetObject",
+# 				"s3:PutObject"
+# 			],
+# 			"Resource": [
+# 				"arn:aws:s3:::abdo6-grupo-k-ci-deploy/${aws_glue_crawler.crawler[each.key].name}*"
+# 			]
+# 		}
+# 	]
+# } 
+# EOF
+# }
 
-resource "aws_glue_catalog_database" "database" {
-  name = var.bucket_name
-  catalog_id = var.account_id
-}
+# resource "aws_glue_catalog_database" "database" {
+#   name = var.bucket_name
+#   catalog_id = var.account_id
+# }
 
-resource "aws_glue_crawler" "crawler" {
-  database_name = aws_glue_catalog_database.database.name
-  for_each = toset(var.crawlers)
-  name          = "${each.value}"
-  role          = aws_iam_role.crawler-role[each.key].arn
+# resource "aws_glue_crawler" "crawler" {
+#   database_name = aws_glue_catalog_database.database.name
+#   for_each = toset(var.crawlers)
+#   name          = "${each.value}"
+#   role          = aws_iam_role.crawler-role[each.key].arn
 
-  s3_target {
-    path = "s3://${aws_s3_bucket.b.bucket}/${each.value}/"
-  }
+#   s3_target {
+#     path = "s3://${aws_s3_bucket.b.bucket}/${each.value}/"
+#   }
 
-}
+# }
 
-resource "aws_glue_job" "transform-to-parquet" {
-  name     = "transform-to-parquet"
-  role_arn = [for value in aws_iam_role.crawler-role: value.arn][0]
-  number_of_workers = 6
-  worker_type = "G.1X"
-  glue_version = "3.0"
+# resource "aws_glue_job" "transform-to-parquet" {
+#   name     = "transform-to-parquet"
+#   role_arn = [for value in aws_iam_role.crawler-role: value.arn][0]
+#   number_of_workers = 6
+#   worker_type = "G.1X"
+#   glue_version = "3.0"
 
-  command {
-    script_location = "s3://${aws_s3_bucket.b.bucket}/transform-to-parquet.py"
-  }
-}
+#   command {
+#     script_location = "s3://${aws_s3_bucket.b.bucket}/transform-to-parquet.py"
+#   }
+# }
