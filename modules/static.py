@@ -1,4 +1,4 @@
-BUCKET_NAME = 'terraform-ci-deploy'
+BUCKET_NAME = 'abdo6-grupo-k-ci-deploy'
 REGION = 'us-west-2'
 ACCOUNT_ID = '007774094020'
 LANDING_BUCKET = "ingest_csv/"

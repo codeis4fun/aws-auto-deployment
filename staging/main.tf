@@ -96,8 +96,8 @@ resource "aws_sqs_queue" "queue" {
     ]
 }
 
-resource "aws_iam_role" "firehose-role" {
-  name = "firehose-role"
+resource "aws_iam_role" "firehose-role-ci" {
+  name = "firehose-role-ci"
 
   assume_role_policy = <<EOF
   {
@@ -115,9 +115,9 @@ resource "aws_iam_role" "firehose-role" {
   }
   EOF
 }
-resource "aws_iam_role_policy" "firehose-role-policy" {
-  name        = "firehose-role-policy"
-  role   = aws_iam_role.firehose-role.id
+resource "aws_iam_role_policy" "firehose-role-ci-policy" {
+  name        = "firehose-role-ci-policy"
+  role   = aws_iam_role.firehose-role-ci.id
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -139,7 +139,7 @@ resource "aws_kinesis_firehose_delivery_stream" "firehose-ds" {
     
 
     extended_s3_configuration {
-        role_arn = aws_iam_role.firehose-role.arn
+        role_arn = aws_iam_role.firehose-role-ci.arn
         bucket_arn = aws_s3_bucket.b.arn
         prefix = "ingest_json/"
         error_output_prefix = "ingest_json-error/"
@@ -269,7 +269,7 @@ resource "aws_iam_role_policy" "crawler-role-policy" {
 				"s3:PutObject"
 			],
 			"Resource": [
-				"arn:aws:s3:::terraform-ci-deploy/${aws_glue_crawler.crawler[each.key].name}*"
+				"arn:aws:s3:::abdo6-grupo-k-ci-deploy/${aws_glue_crawler.crawler[each.key].name}*"
 			]
 		}
 	]
