@@ -16,6 +16,7 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
+    environment: staging 
     strategy:
       matrix:
         node-version: [14.x]
