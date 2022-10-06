@@ -11,14 +11,14 @@ provider:
       Action:
         - "sqs:*"
       Resource: 
-        - "arn:aws:sqs:us-west-2:007774094020:second-queue"
+        - "arn:aws:sqs:us-west-2:007774094020:raw-json-queue"
         
 functions:
   myEventTrigger:
     handler: handler.step03
     events:
       - s3:
-         bucket: abdo6-grupo-k-terraform
+         bucket: terraform-ci-deploy
          event: s3:ObjectCreated:*
          rules:
             - prefix: raw_json/

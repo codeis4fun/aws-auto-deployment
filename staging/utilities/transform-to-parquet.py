@@ -14,7 +14,7 @@ job.init(args["JOB_NAME"], args)
 
 # Script generated for node S3 bucket
 S3bucket_node1 = glueContext.create_dynamic_frame.from_catalog(
-    database="abdo6-grupo-k-terraform",
+    database="terraform-ci-deploy",
     table_name="raw_json",
     transformation_ctx="S3bucket_node1",
 )
@@ -46,7 +46,7 @@ ApplyMapping_node2 = ApplyMapping.apply(
 
 # Script generated for node S3 bucket
 S3bucket_node3 = glueContext.getSink(
-    path="s3://abdo6-grupo-k-terraform/parquet/",
+    path="s3://terraform-ci-deploy/parquet/",
     connection_type="s3",
     updateBehavior="UPDATE_IN_DATABASE",
     partitionKeys=[],
@@ -55,7 +55,7 @@ S3bucket_node3 = glueContext.getSink(
     transformation_ctx="S3bucket_node3",
 )
 S3bucket_node3.setCatalogInfo(
-    catalogDatabase="abdo6-grupo-k-terraform", catalogTableName="parquet"
+    catalogDatabase="terraform-ci-deploy", catalogTableName="parquet"
 )
 S3bucket_node3.setFormat("glueparquet")
 S3bucket_node3.writeFrame(ApplyMapping_node2)

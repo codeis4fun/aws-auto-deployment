@@ -269,7 +269,7 @@ resource "aws_iam_role_policy" "crawler-role-policy" {
 				"s3:PutObject"
 			],
 			"Resource": [
-				"arn:aws:s3:::abdo6-grupo-k-terraform/${aws_glue_crawler.crawler[each.key].name}*"
+				"arn:aws:s3:::terraform-ci-deploy/${aws_glue_crawler.crawler[each.key].name}*"
 			]
 		}
 	]
