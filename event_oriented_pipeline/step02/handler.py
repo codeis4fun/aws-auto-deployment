@@ -1,10 +1,9 @@
-from modules.cloud import FIREHOSE, S3, logger
+from modules.cloud import S3, logger
 from modules.static import *
 import pandas as pd
 import io, json
 
 s3 = S3(REGION, ACCOUNT_ID, BUCKET_NAME)
-firehose = FIREHOSE(REGION, ACCOUNT_ID, FIREHOSE_DS)
 
 def step02(event, context):
     logger.info(event)
