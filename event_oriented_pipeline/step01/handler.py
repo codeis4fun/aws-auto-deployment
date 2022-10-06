@@ -1,12 +1,10 @@
-from modules.cloud import FIREHOSE, S3, SQS, logger
+from modules.cloud import SQS, logger
 from modules.static import *
 
-s3 = S3(REGION, ACCOUNT_ID, BUCKET_NAME)
-firehose = FIREHOSE(REGION, ACCOUNT_ID, FIREHOSE_DS)
+sqs = SQS(REGION, ACCOUNT_ID, SQS_QUEUES[0])
 
 def step01(event, context):
     logger.info(event)
-    sqs = SQS(REGION, ACCOUNT_ID, SQS_QUEUES[0])
 
     bucket_name = event["Records"][0]["s3"]["bucket"]["name"]
     bucket_path = event["Records"][0]["s3"]["object"]["key"]
