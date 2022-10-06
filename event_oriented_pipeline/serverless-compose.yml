@@ -2,10 +2,9 @@ state:
   backend: s3
 
 services:
-
   a-from-s3-to-sqs:
     path: step01
-
+    
   b-from-sqs-to-s3:
     path: step02
 
