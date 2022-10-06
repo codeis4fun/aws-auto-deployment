@@ -16,21 +16,21 @@ jobs:
   deploy:
     name: deploy
     runs-on: ubuntu-latest
-    environment: staging 
     strategy:
       matrix:
-        node-version: [14.x]
+        node-version: [16.x]
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: npm install -g serverless
-      - run: serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      - run: serverless deploy --verbose
-        working-directory: ./event_oriented_pipeline
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          SLS_DEBUG: 1
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm ci
+    - name: Enter dir and deploy
+      uses: serverless/github-action@v3.1
+      with:
+        args: -c "cd ./event_oriented_pipeline && serverless deploy"
+        entrypoint: /bin/sh
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
