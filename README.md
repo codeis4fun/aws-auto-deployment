@@ -1,5 +1,6 @@
 
 
+
 # Resumo
 Este projeto faz parte do terceiro solution sprint do **MBA** em Engenharia de Dados da **FIAP**.
 
@@ -134,6 +135,37 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
         
         O resultado da query é o seguinte:
         ![contagem linhas raw_json](images/parquet2.png)
+
+# CI/CD
+A parte de entrega contínua e deployment contínuo foi incluída no projeto como parte de um desafio pessoal para o autor. 
+- *Terraform*: Os arquivos que gerenciam a infraestrutura na **AWS** estão no diretório ***./staging***. Para que o estado da infraestrutura fosse mantido e não se perdesse a cada deploy, foi necessário criar um *backend* **S3** manualmente na **AWS**. Logo após, a seguinte configuração foi adicionada ao arquivo ***./staging/main.tf***:
+	```
+	
+	terraform {
+		backend  "s3" {
+		bucket  =  "terraform-ci-deploy"
+		key  =  "infra-state"
+		region  =  "us-west-2"
+		}
+	}
+
+- *Serverless Framework*: Para o deploy das funções **Lambda**, foi utilizado o *[Serverless Compose](https://www.serverless.com/framework/docs/guides/compose)*. O arquivo **YAML** de orquestração dos deployments está em ***./event_oriented_pipeline/serverless-compose.yml*** e assim como no Terraform, também foi necessário um *backend* **S3** para guardar os estados das funções **Lambda**.
+    ```
+        state:
+        backend: s3
+
+        services:
+        a-from-s3-to-sqs:
+            path: step01
+
+        b-from-sqs-to-s3:
+            path: step02
+
+        c-from-s3-to-sqs:
+            path: step03
+
+        d-from-sqs-to-firehose:
+            path: step04
 
 
 # Contato
