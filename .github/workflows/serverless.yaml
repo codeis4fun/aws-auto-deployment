@@ -35,9 +35,9 @@ jobs:
     
     - name: copying dependencies
       run: |
-        cp -r ./modules ./event_oriented_pipeline/step01/ \
-        cp -r ./modules ./event_oriented_pipeline/step02/ \
-        cp -r ./modules ./event_oriented_pipeline/step03/ \
+        cp -r ./modules ./event_oriented_pipeline/step01/ &&\
+        cp -r ./modules ./event_oriented_pipeline/step02/ &&\
+        cp -r ./modules ./event_oriented_pipeline/step03/ &&\
         cp -r ./modules ./event_oriented_pipeline/step04/
 
     - name: serverless-compose deploy
