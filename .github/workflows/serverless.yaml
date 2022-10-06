@@ -12,27 +12,25 @@ on:
     paths: 
     - event_oriented_pipeline/**
 
-jobs: 
-  serverless:
+jobs:
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
-    name: Serverless
-    environment: staging
-    defaults:
-      run:
-        working-directory: ./event_oriented_pipeline
+    strategy:
+      matrix:
+        node-version: [14.x]
     steps:
-    - name: Set up Node
-      uses: actions/setup-node@v1
-      with:
-        node-version: 12
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8  # Update with your python version
-
-    - name: Serverless Deploy
-      uses: dhollerbach/actions.serverless-with-python-requirements@master
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - uses: actions/checkout@v2
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: yarn install
+      - run: yarn workspace @berry/shared build
+      - run: node ./node_modules/serverless/bin/serverless.js config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }} --overwrite
+      - run: node ../../node_modules/serverless/bin/serverless.js deploy --verbose
+        working-directory: ./event_oriented_pipeline
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          SLS_DEBUG: 1
