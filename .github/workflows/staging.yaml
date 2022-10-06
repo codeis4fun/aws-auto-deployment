@@ -24,16 +24,12 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with:
-        working-directory: './staging'
-        plan-title: 'Staging :star:'
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
       with:
         terraform_version: 1.2.9
-        terraform_wrapper: false
+        terraform_wrapper: true
 
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
@@ -45,67 +41,33 @@ jobs:
       working-directory: ./staging # Use your environment folder
       shell: bash
 
-    # Checks that all Terraform configuration files adhere to a canonical format
-    - name: Terraform Format
-      id: fmt
-      run: terraform fmt -check
+    - name: Terraform Validate
+      id: validate
+      working-directory: ./staging # Use your environment folder
+      run: terraform validate -no-color
 
-    # Generates an execution plan for Terraform
     - name: Terraform Plan
       id: plan
-      run: |
-        terraform plan -input=false -no-color -out tf.plan
+      run: terraform plan -out workspace.plan
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       working-directory: ./staging # Use your environment folder
-      shell: bash
-
-    - name: Terraform Show
-      id: show
-      run: terraform show -no-color tf.plan 2>&1 > /tmp/plan.txt
-      working-directory: ./staging # Use your environment folder
+      
+    - name: Post Plan
+      if: always() && github.ref != 'refs/heads/main' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
+      uses: robburger/terraform-pr-commenter@v1
       env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      shell: bash
-
-    - uses: actions/github-script@v6
-      if: github.event_name == 'pull_request'
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const fs = require("fs");
-          const plan = fs.readFileSync("/tmp/plan.txt", "utf8");
-          const maxGitHubBodyCharacters = 65536;
-
-          function chunkSubstr(str, size) {
-            const numChunks = Math.ceil(str.length / size)
-            const chunks = new Array(numChunks)
-            for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
-              chunks[i] = str.substr(o, size)
-            }
-            return chunks
-          }
-
-          // Split the Terraform plan into chunks if it's too big and can't fit into the GitHub Action
-          var plans = chunkSubstr(plan, maxGitHubBodyCharacters); 
-          for (let i = 0; i < plans.length; i++) {
-            const output = `### ${{ inputs.plan-title }} Part # ${i + 1}
-            #### Terraform Format and Style 🖌\`${{ steps.fmt.outcome }}\`
-            #### Terraform Initialization ⚙️\`${{ steps.init.outcome }}\`
-            #### Terraform Plan 📖\`${{ steps.plan.outcome }}\`
-            <details><summary>Show Plan</summary>
-            \`\`\`\n
-            ${plans[i]}
-            \`\`\`
-            </details>
-            *Pusher: @${{ github.actor }}, Action: \`${{ github.event_name }}\`, Working Directory: \`${{ inputs.working-directory }}\`, Workflow: \`${{ github.workflow }}\`*`;   
-
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: output
-            })
-          }
+        commenter_type: plan
+        commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+  
+    - name: Terraform Apply
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      working-directory: ./staging # Use your environment folder
+      run: terraform apply workspace.plan -auto-approve
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
