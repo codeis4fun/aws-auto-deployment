@@ -18,8 +18,8 @@ functions:
     handler: handler.step01
     events:
       - s3:
-         bucket: abdo6-grupo-k-ci-deploy
-         event: s3:ObjectCreated:*
-         rules:
-            - prefix: ingest_csv/
-         existing: true
+        bucket: abdo6-grupo-k-ci-deploy
+        event: s3:ObjectCreated:*
+        rules:
+          - prefix: ingest_csv/
+        existing: true
