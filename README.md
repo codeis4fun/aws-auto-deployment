@@ -1,3 +1,5 @@
+
+
 # Resumo
 Este projeto faz parte do terceiro solution sprint do **MBA** em Engenharia de Dados da **FIAP**.
 
@@ -9,7 +11,13 @@ Os arquivos **CSV** foram separados em arquivos menores de **50.000** linhas. Fo
 
 # Arquitetura
 
-O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos para construir o pipeline foram os seguintes:
+O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos para construir o pipeline, desenho da arquitetura de dados e explicação dos códigos estão logo abaixo:
+
+- ## Desenho das arquiteturas
+
+![arquitetura manual](images/manual.png)
+
+![arquitetura por eventos](images/events.png)
 
 -  ## Serviços
 
@@ -94,13 +102,38 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 	-  *raw-json-queue*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados a diante na pipeline. O *threshold* está setado para **50** tentativas.
 
 - ## Kinesis Data Firehose
-	O Firehose recebe o streaming de dados tanto pela ingestão manual quanto pela ingestão por eventos. A configuração foi setada aguardar 300 segundos e fechar um pacote de dados e enviá-lo ao bucket **abdo6-grupo-k-ci-deploy** no prefixo ***ingest_json***. O armazenamento é feito no formato ***YYYY/MM/DD/H/***
+	O Firehose recebe o streaming de dados tanto pela ingestão manual quanto pela ingestão por eventos. A configuração foi setada para aguardar 300 segundos ou 5MB de dados (o que ocorrer primeiro) e fechar um pacote de dados e enviá-lo ao bucket **abdo6-grupo-k-ci-deploy** no prefixo ***ingest_json***. O armazenamento é feito no formato ***YYYY/MM/DD/H/***
 
-## Desenho das arquiteturas
+- ## AWS Glue
+	- Database criada com o nome **abdo6-grupo-k-ci-deploy**.
+	- *Crawlers*: Foi criado um crawler chamado ***raw_json*** para ler o conteúdo dos arquivos JSON no bucket **abdo6-grupo-k-ci-deploy** com prefixo ***raw_json***. Os dados *crawleados* são armazenados em uma ***flat table*** chamada ***raw_json***. Não foi setado *schedule*, por tanto sua frequência é *on-demand*.
+	- *Jobs*: O arquivo pyspark ***staging/utilities/transform-to-parquet.py*** é responsável por ler o conteúdo da *flat table* ***raw_json*** e converter o seu conteúdo para o formato **PARQUET** e enviado para o bucket **abdo6-grupo-k-ci-deploy** no prefixo ***parquet***. Após isso, os dados são catalogados em outra *flat table* chamada ***parquet***.
 
-![arquitetura manual](images/manual.png)
+- ## AWS Athena
+    Finalmente, chegou o momento de realizar as consultas SQL sobre os dados ingeridos. Aqui fica evidente a eficiência ao armazenar arquivos no formato **PARQUET**. A redução de tamanho foi de aproximadamente **70%**.
+    - *flat table* ***raw_json***: 
+    
+            SELECT COUNT(*) from raw_json;
 
-![arquitetura por eventos](images/events.png)
+        O resultado da query é o seguinte:
+        ![contagem linhas raw_json](images/raw_json.png)
+
+            SELECT * from raw_json;
+
+        O resultado da query é o seguinte:
+        ![contagem linhas raw_json](images/raw_json2.png)
+        
+    - *flat table* ***parquet***:
+            
+            SELECT COUNT(*) from parquet;
+        
+        O resultado da query é o seguinte:
+        ![contagem linhas raw_json](images/parquet.png)
+
+            SELECT COUNT(*) from parquet;
+        
+        O resultado da query é o seguinte:
+        ![contagem linhas raw_json](images/parquet2.png)
 
 
 ### Contato
