@@ -18,7 +18,7 @@ functions:
     handler: handler.step03
     events:
       - s3:
-         bucket: terraform-ci-deploy
+         bucket: abdo6-grupo-k-ci-deploy
          event: s3:ObjectCreated:*
          rules:
             - prefix: raw_json/
