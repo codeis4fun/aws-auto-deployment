@@ -25,9 +25,8 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
-    - run: cd ./event_oriented_pipeline && npm ci
-    - name: Enter dir and deploy
-      uses: serverless/github-action@v3.1
+    - name: serverless deploy
+      uses: serverless/github-action@v3
       with:
         args: -c "cd ./event_oriented_pipeline && serverless deploy"
         entrypoint: /bin/sh
