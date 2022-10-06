@@ -12,11 +12,8 @@ provider:
         - "s3:*"
       Resource: 
         - "arn:aws:s3:::*"
-        
-layers:
-  pandas:
-    package:
-      artifact: pandas.zip
+  layers:
+    - arn:aws:lambda:us-west-2:336392948345:layer:AWSSDKPandas-Python37:1        
 
 functions:
   myEventTrigger:
