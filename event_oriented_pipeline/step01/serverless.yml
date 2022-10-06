@@ -12,7 +12,7 @@ provider:
         - "sqs:*"
       Resource: 
         - "arn:aws:sqs:us-west-2:007774094020:ingest-csv-queue"
-        
+
 functions:
   myEventTrigger:
     handler: handler.step01

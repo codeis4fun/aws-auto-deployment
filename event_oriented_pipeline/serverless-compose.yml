@@ -1,15 +1,14 @@
 state:
   backend: s3
-  prefix: terraform-ci-deploy
 
 services:
 
   a-from-s3-to-sqs:
     path: step01
- 
+
   b-from-sqs-to-s3:
     path: step02
-  
+
   c-from-s3-to-sqs:
     path: step03
 

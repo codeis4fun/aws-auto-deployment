@@ -12,25 +12,29 @@ on:
     paths: 
     - event_oriented_pipeline/**
 
-jobs: 
-  terraform:
+jobs:
+  deploy:
+    name: deploy
     runs-on: ubuntu-latest
-    name: Serverless
     environment: staging 
+    strategy:
+      matrix:
+        node-version: [16.x]
     steps:
-
-    - name: Set up Node
-      uses: actions/setup-node@v1
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
       with:
-        node-version: 12
+        node-version: ${{ matrix.node-version }}
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.8  # Update with your python version
+    - name: install serverless
+      run: npm install -g serverless
 
-    - name: Serverless Deploy
-      uses: dhollerbach/actions.serverless-with-python-requirements@master
+    - name: install serverless compose
+      run: npm i -g @serverless/compose
+
+    - name: serverless-compose deploy
+      run: "cd ./event_oriented_pipeline && serverless-compose deploy"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
