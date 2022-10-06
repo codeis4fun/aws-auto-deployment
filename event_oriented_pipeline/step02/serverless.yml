@@ -23,7 +23,7 @@ functions:
     handler: handler.step02
     events:
       - sqs:
-          arn: arn:aws:sqs:us-west-2:007774094020:first-queue
+          arn: arn:aws:sqs:us-west-2:007774094020:ingest-csv-queue
           batchSize: 1
           maximumBatchingWindow: 60
           functionResponseType: ReportBatchItemFailures

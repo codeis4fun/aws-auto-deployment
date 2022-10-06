@@ -11,14 +11,14 @@ provider:
       Action:
         - "sqs:*"
       Resource: 
-        - "arn:aws:sqs:us-west-2:007774094020:first-queue"
+        - "arn:aws:sqs:us-west-2:007774094020:ingest-csv-queue"
         
 functions:
   myEventTrigger:
     handler: handler.step01
     events:
       - s3:
-         bucket: abdo6-grupo-k-terraform
+         bucket: terraform-ci-deploy
          event: s3:ObjectCreated:*
          rules:
             - prefix: ingest_csv/

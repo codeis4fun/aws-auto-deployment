@@ -1,9 +1,9 @@
-BUCKET_NAME = 'abdo6-grupo-k-terraform'
+BUCKET_NAME = 'terraform-ci-deploy'
 REGION = 'us-west-2'
 ACCOUNT_ID = '007774094020'
 LANDING_BUCKET = "ingest_csv/"
 JSON_BUCKET = "raw_json/"
-SQS_QUEUES = ["first-queue", "second-queue"]
+SQS_QUEUES = ["ingest-csv-queue", "raw-json-queue"]
 FIREHOSE_DS = "firehose-ds"
 CSV_COLLUMNS = ["BibNum", "Title", "Author",
             "ISBN", "PublicationYear", "Publisher", "Publisher", 
