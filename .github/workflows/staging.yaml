@@ -35,12 +35,6 @@ jobs:
         terraform_version: 1.2.9
         terraform_wrapper: false
 
-    - name: Terraform fmt
-      id: fmt
-      working-directory: ./staging # Use your environment folder
-      run: terraform fmt -check
-      continue-on-error: true
-
     # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
     - name: Terraform Init
       id: init
