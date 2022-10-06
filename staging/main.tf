@@ -61,6 +61,17 @@ resource "aws_s3_object" "object" {
     ]
 }
 
+resource "aws_s3_object" "upload-dataset" {
+    bucket = var.bucket_name
+    for_each = fileset("dataset/", "*.csv")
+    key = "${var.landing_bucket}/${each.value}"
+    source = "dataset/${each.value}"
+    depends_on = [
+      aws_s3_bucket.b,
+      aws_s3_bucket_acl.b-acl
+    ]
+}
+
 resource "aws_s3_object" "athena-query" {
     bucket = var.bucket_name
     key = "athena-query/"
