@@ -31,10 +31,7 @@ jobs:
       run: npm i -g @serverless/compose
 
     - name: serverless-compose deploy
-      uses: serverless/github-action@v3
-      with:
-        args: -c "cd ./event_oriented_pipeline && serverless-compose deploy deploy"
-        entrypoint: /bin/sh
+      run: "cd ./event_oriented_pipeline && serverless-compose deploy"
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
