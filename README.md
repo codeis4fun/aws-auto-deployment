@@ -152,20 +152,20 @@ A parte de entrega contínua e deployment contínuo foi incluída no projeto com
 - *Serverless Framework*: Para o deploy das funções **Lambda**, foi utilizado o *[Serverless Compose](https://www.serverless.com/framework/docs/guides/compose)*. O arquivo **YAML** de orquestração dos deployments está em ***./event_oriented_pipeline/serverless-compose.yml*** e assim como no Terraform, também foi necessário um *backend* **S3** para guardar os estados das funções **Lambda**.
     ```
         state:
-        backend: s3
+            backend: s3
 
         services:
-        a-from-s3-to-sqs:
-            path: step01
+            a-from-s3-to-sqs:
+                path: step01
 
-        b-from-sqs-to-s3:
-            path: step02
+            b-from-sqs-to-s3:
+                path: step02
 
-        c-from-s3-to-sqs:
-            path: step03
+            c-from-s3-to-sqs:
+                path: step03
 
-        d-from-sqs-to-firehose:
-            path: step04
+            d-from-sqs-to-firehose:
+                path: step04
 
 
 # Contato
