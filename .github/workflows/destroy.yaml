@@ -1,0 +1,57 @@
+name: 'Terraform - Destroy'
+
+on: 
+  workflow_dispatch:
+    logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'warning'
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs: 
+  terraform:
+    runs-on: ubuntu-latest
+    name: Terraform
+    environment: staging 
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.2.9
+        terraform_wrapper: true
+
+    - name: Terraform Validate
+      id: validate
+      working-directory: ./staging # Use your environment folder
+      run: terraform validate -no-color
+
+    - name: Terraform Plan
+      id: plan
+      run: terraform plan
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      working-directory: ./staging # Use your environment folder
+      
+    - name: Post Plan
+      if: always() && github.ref != 'refs/heads/main' && (steps.plan.outcome == 'success' || steps.plan.outcome == 'failure')
+      uses: robburger/terraform-pr-commenter@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        commenter_type: plan
+        commenter_input: ${{ format('{0}{1}', steps.plan.outputs.stdout, steps.plan.outputs.stderr) }}
+        commenter_exitcode: ${{ steps.plan.outputs.exitcode }}
+  
+    - name: Terraform Destroy
+      working-directory: ./staging # Use your environment folder
+      run: terraform destroy -auto-approve
+      env:
+        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
