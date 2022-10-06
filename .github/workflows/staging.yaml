@@ -59,15 +59,6 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       working-directory: ./staging # Use your environment folder
       shell: bash
-
-    - name: Terraform Show
-      id: show
-      run: terraform show -no-color tf.plan 2>&1 > /tmp/plan.txt
-      working-directory: ./staging # Use your environment folder
-      env:
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      shell: bash
       
     - uses: actions/github-script@v6
       if: github.event_name == 'pull_request'
