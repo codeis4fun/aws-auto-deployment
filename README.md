@@ -53,9 +53,13 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 
 - ## Buckets
 	- *abdo6-grupo-k-ci-deploy*: Bucket principal que contém as demais camadas utilizadas para armazenamento e transformação dos arquivos até seu estado final.
+
 	- *abdo6-grupo-k-ci-deploy/ingest_csv*: Bucket para onde os arquivos **CSV** são enviados para processamento manual ou por uma função **Lambda** disparada por eventos.
+
 	- *abdo6-grupo-k-ci-deploy/raw_json*: Bucket para onde os arquivos **CSV** após conversão em **JSON Lines** ficam armazenados.
+
 	- *abdo6-grupo-k-ci-deploy/ingest_json*: Bucket onde o **Firehose** irá armazenar os dados **JSON** que recebe via **PUT**.
+
 	- *abdo6-grupo-k-ci-deploy/parquet*: Bucket que contém a conversão dos arquivos **JSON** que estão em *abdo6-grupo-k-ci-deploy/raw_json* e que são convertidos para o formato **PARQUET**.
 
 -  ## Scripts para ingestão manual
