@@ -1,6 +1,7 @@
 
 
 
+
 # Resumo
 Este projeto faz parte do terceiro solution sprint do **MBA** em Engenharia de Dados da **FIAP**.
 
@@ -40,6 +41,23 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 
 	-  *Serverless*: O *Serverless Framework* ajuda no desenvolvimento e deploy de funções *AWS Lambda* e seus recursos necessários dentro da infraestrutura da **AWS**.
 
+					
+-  ## Filas no SQS
+
+	-  *ingest-csv-queue*: Fila responsável por receber os eventos disparados manualmente através do script ***manual_pipeline/1_from_s3_to_sqs.py*** ou disparados pela função lambda ***a-from-s3-to-sqs***.
+
+	-  *ingest-csv-queue-dl*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados a diante na pipeline. O *threshold* está setado para **50** tentativas.
+
+	-  *raw-json-queue*: Fila responsável por receber os eventos disparados manualmente através do script ***manual_pipeline/3_from_s3_to_sqs.py*** ou disparados pela função lambda ***c-from-s3-to-sqs***.
+	-  *raw-json-queue*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados a diante na pipeline. O *threshold* está setado para **50** tentativas.
+
+- ## Buckets
+	- *abdo6-grupo-k-ci-deploy*: Bucket principal que contém as demais camadas utilizadas para armazenamento e transformação dos arquivos até seu estado final.
+	- *abdo6-grupo-k-ci-deploy/ingest_csv*: Bucket para onde os arquivos **CSV** são enviados para processamento manual ou por uma função **Lambda** disparada por eventos.
+	- *abdo6-grupo-k-ci-deploy/raw_json*: Bucket para onde os arquivos **CSV** após conversão em **JSON Lines** ficam armazenados.
+	- *abdo6-grupo-k-ci-deploy/ingest_json*: Bucket onde o **Firehose** irá armazenar os dados **JSON** que recebe via **PUT**.
+	- *abdo6-grupo-k-ci-deploy/parquet*: Bucket que contém a conversão dos arquivos **JSON** que estão em *abdo6-grupo-k-ci-deploy/raw_json* e que são convertidos para o formato **PARQUET**.
+
 -  ## Scripts para ingestão manual
 
 	-  *manual_pipeline/1_from_s3_to_sqs.py*: Script responsável por listar todos objetos no bucket **abdo6-grupo-k-ci-deploy**  com o prefixo ***ingest_csv*** e enviar à fila ***ingest-csv-queue***.
@@ -48,13 +66,13 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 	 
 			{"bucket": "abdo6-grupo-k-ci-deploy", "key":"ingest_csv/library-collection-inventory.00001.csv"}
 
-	-  *manual_pipeline/2_from_sqs_to_s3.py*: Script responsável por ler as mensagens da file ***ingest-csv-queue***, marcá-las como lidas e converter os arquivos ***CSV*** em ***JSON Lines***.
+	-  *manual_pipeline/2_from_sqs_to_s3.py*: Script responsável por ler as mensagens da file ***ingest-csv-queue***, marcá-las como lidas e converter os arquivos ***CSV*** em ***JSON Lines***. Após a conversão, os arquivos são salvos no bucket **abdo6-grupo-k-ci-deploy** com o prefixo ***raw_json***
 
 	-  *manual_pipeline/3_from_s3_to_sqs.py*: Script responsável por listar todos objetos no bucket **abdo6-grupo-k-ci-deploy** com o prefixo ***raw_json*** e enviar à fila ***raw-json-queue***.
 	
 		 Exemplo de payload JSON enviado à fila:
 		 
-			 {"bucket": "abdo6-grupo-k-ci-deploy", "key":"raw-json/library-collection-inventory.00001.json"}
+			 {"bucket": "abdo6-grupo-k-ci-deploy", "key":"raw_json/library-collection-inventory.00001.json"}
 
 	-  *manual_pipeline/4_from_sqs_to_firehose.py*: Script responsável por ler as mensagens da fila ***raw-json-queue***, ler o conteúdo do arquivo **JSON** e enviar um **PUT** ao ***Firehose Delivery Stream***.
 	
@@ -64,7 +82,7 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 
 
 -	## Scripts para ingestão por eventos
-	-	*event_oriented_pipeline/step01/handler.py*: Esta função **Lambda** é disparada toda vez que novos arquivos com prefixo ***ingest-csv*** são enviados ao bucket **abdo6-grupo-k-ci-deploy**. O destino da mensagem do evento é a fila ***ingest-csv-queue***.
+	-	*event_oriented_pipeline/step01/handler.py*: Esta função **Lambda** é disparada toda vez que novos arquivos com prefixo ***ingest_csv*** são enviados ao bucket **abdo6-grupo-k-ci-deploy**. O destino da mensagem do evento é a fila ***ingest-csv-queue***.
 	-	
 		Exemplo de log gerado na função:
 
@@ -73,7 +91,7 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 
 
 
-	-	*event_oriented_pipeline/step02/handler.py*: Esta função **Lambda** é disparada toda vez que há novas mensagens na fila ***ingest-csv-queue***. Para cada evento gerado, a função converte o arquivo CSV em JSON e envia ao bucket **abdo6-grupo-k-ci-deploy** com o prefixo ***raw_json***.
+	-	*event_oriented_pipeline/step02/handler.py*: Esta função **Lambda** é disparada toda vez que há novas mensagens na fila ***ingest-csv-queue***. Para cada evento gerado, a função converte o arquivo **CSV** em **JSON** e envia ao bucket **abdo6-grupo-k-ci-deploy** com o prefixo ***raw_json***.
 		
 		Exemplo de log gerado na função:
 
@@ -92,18 +110,9 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 				
 			2022-10-06 16:30:49 - AWS Services - INFO - {'Records': [{'messageId': '932f65d1-3032-48e7-9c00-22f5dfcc6f83', 'receiptHandle': 'AQEBQjkUAyuq4LXVbSf0etu5s681bAOZ4k7qZdGik0GOwkiU+ohklkYJSUJ8rNKkd85LpQPwNx0DNUhrHjLZMdRtR38uUzjCMg9dPBdIlHW3Z/yJG4Ek1ItgZ4e3fREVL9ehYXVuwHHq96TmeoSDW5r3W6qJirAelI0jtyWnmnhG6kTcqvqpymvscuw08y9jOxSRez0aATgNCXfDAXr474lZL1X05NXsJ1NYUGYLbraXV29rTIyN9rRbpApa8P6C2Qj6MY7IpBcPP3wGGKqgZ8GeQmFk/CehvFFMe762T7RtpmZAx7B1uu8BF64mjJ+seRxQEdXazJyKvf+GrQBNaxFRhV3mWC1rTFDaDlUvqIM8G0UPd4lrbZMh0e4jaOt41ddEWxcSu8uDQsg/f221PgFXAw==', 'body': '{"Id": "d5d1b53a-458e-11ed-a11a-aa27359b1b2b", "MessageBody": {"bucket": "abdo6-grupo-k-ci-deploy", "key": "raw_json/library-collection-inventory.00007.json"}}', 'attributes': {'ApproximateReceiveCount': '25', 'SentTimestamp': '1665071529336', 'SenderId': 'AROAQDT27ILCLOBJSQZWY:c-from-s3-to-sqs-dev-myEventTrigger', 'ApproximateFirstReceiveTimestamp': '1665071529336'}, 'messageAttributes': {}, 'md5OfMessageAttributes': None, 'md5OfBody': '143a734c04683b59fbbb50b3d1c68fbd', 'eventSource': 'aws:sqs', 'eventSourceARN': 'arn:aws:sqs:us-west-2:007774094020:raw-json-queue', 'awsRegion': 'us-west-2'}]}
 
-					
--  ## Filas no SQS
-
-	-  *ingest-csv-queue*: Fila responsável por receber os eventos disparados manualmente através do script ***manual/1_from_s3_to_sqs.py*** ou disparados pela função lambda ***a-from-s3-to-sqs***.
-
-	-  *ingest-csv-queue-dl*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados a diante na pipeline. O *threshold* está setado para **50** tentativas.
-
-	-  *raw-json-queue*: Fila responsável por receber os eventos disparados manualmente através do script ***manual/3_from_s3_to_sqs.py*** ou disparados pela função lambda ***c-from-s3-to-sqs***.
-	-  *raw-json-queue*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados a diante na pipeline. O *threshold* está setado para **50** tentativas.
 
 - ## Kinesis Data Firehose
-	O Firehose recebe o streaming de dados tanto pela ingestão manual quanto pela ingestão por eventos. A configuração foi setada para aguardar 300 segundos ou 5MB de dados (o que ocorrer primeiro) e fechar um pacote de dados e enviá-lo ao bucket **abdo6-grupo-k-ci-deploy** no prefixo ***ingest_json***. O armazenamento é feito no formato ***YYYY/MM/DD/H/***
+	O Firehose recebe o streaming de dados tanto pela ingestão manual quanto pela ingestão por eventos. A configuração foi setada para aguardar 300 segundos ou 5MB de arquivo (o que ocorrer primeiro) e fechar um pacote de dados e enviá-lo ao bucket **abdo6-grupo-k-ci-deploy** no prefixo ***ingest_json***. O armazenamento é feito no formato ***YYYY/MM/DD/H/***
 
 - ## AWS Glue
 	- Database criada com o nome **abdo6-grupo-k-ci-deploy**.
