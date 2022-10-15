@@ -46,10 +46,10 @@ O provedor de cloud público utilizado foi a **AWS**. Os serviços propostos par
 
 	-  *ingest-csv-queue*: Fila responsável por receber os eventos disparados manualmente através do script ***manual_pipeline/1_from_s3_to_sqs.py*** ou disparados pela função lambda ***a-from-s3-to-sqs***.
 
-	-  *ingest-csv-queue-dl*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados a diante na pipeline. O *threshold* está setado para **50** tentativas.
+	-  *ingest-csv-queue-dl*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados adiante na pipeline. O *threshold* está setado para **50** tentativas.
 
 	-  *raw-json-queue*: Fila responsável por receber os eventos disparados manualmente através do script ***manual_pipeline/3_from_s3_to_sqs.py*** ou disparados pela função lambda ***c-from-s3-to-sqs***.
-	-  *raw-json-queue*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados a diante na pipeline. O *threshold* está setado para **50** tentativas.
+	-  *raw-json-queue*: Fila que armazena os eventos que por algum motivo não puderam ser lidos e passados adiante na pipeline. O *threshold* está setado para **50** tentativas.
 
 - ## Buckets
 	- *abdo6-grupo-k-ci-deploy*: Bucket principal que contém as demais camadas utilizadas para armazenamento e transformação dos arquivos até seu estado final.
